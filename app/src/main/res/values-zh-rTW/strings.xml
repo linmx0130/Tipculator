@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">小費計算機</string>
+    <string name="invalid_number_format_warn">輸入的金額無效！</string>
+    <string name="subtotal_label">稅前小計</string>
+    <string name="tax_label">稅費</string>
+    <string name="tips_rate_label">小費率</string>
+    <string name="is_round_to_dollar_label">取整</string>
+    <string name="tips_label">小費</string>
+    <string name="total_label">總額</string>
+</resources>

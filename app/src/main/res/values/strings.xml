@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Tipculator</string>
+    <string name="invalid_number_format_warn">Number is invalid!</string>
+    <string name="subtotal_label">Subtotal</string>
+    <string name="tax_label">Tax</string>
+    <string name="tips_rate_label">Tips rate</string>
+    <string name="is_round_to_dollar_label">Round to dollar</string>
+    <string name="tips_label">Tips</string>
+    <string name="total_label">Total</string>
+</resources>
