@@ -1,6 +1,8 @@
 package me.mengxiaolin.tipculator
 
+import android.content.Context
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -10,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
@@ -25,6 +28,8 @@ class MainActivity : ComponentActivity() {
             val scrollState = rememberScrollState(0)
             val tipsInCent = calculateTips(subTotal, tax, tipsRate, isRoundToDollar)
 
+            val taxInputBoxFocusRequester = remember { FocusRequester() }
+
             TipculatorTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -38,12 +43,24 @@ class MainActivity : ComponentActivity() {
                         CurrencyInputBox(
                             label = stringResource(R.string.subtotal_label),
                             valueInCents = subTotal,
-                            onValueChange = { subTotal = it }
+                            onValueChange = { subTotal = it },
+                            onClickEnter = {
+                                taxInputBoxFocusRequester.requestFocus()
+                            }
                         )
                         CurrencyInputBox(
                             label = stringResource(R.string.tax_label),
                             valueInCents = tax,
-                            onValueChange = { tax = it }
+                            onValueChange = { tax = it },
+                            focusRequester = taxInputBoxFocusRequester,
+                            onClickEnter = {
+                                // hide the soft keyboard when user finishes input
+                                val view = currentFocus
+                                if (view != null) {
+                                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                                    imm.hideSoftInputFromWindow(view.windowToken, 0)
+                                }
+                            }
                         )
                         TipsRateSelector(
                             value = tipsRate,

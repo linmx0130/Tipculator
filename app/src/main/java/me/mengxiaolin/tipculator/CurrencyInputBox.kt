@@ -17,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -33,13 +35,16 @@ import java.math.BigDecimal
  *  * `valueInCents`: the number value in cents.
  *  * `onValueChange`: the callback to call when the new value is available
  *  * `isEditable`: whether the input box is editable
+ *  * `onClickEnter`: the callback to call when the enter key is clicked
  */
 @Composable
 fun CurrencyInputBox(
     label: String,
     valueInCents: Int,
     onValueChange: (Int) -> Unit,
-    isEditable: Boolean = true
+    isEditable: Boolean = true,
+    onClickEnter: () -> Unit = {},
+    focusRequester: FocusRequester = FocusRequester()
 ) {
     var bufferValue by rememberSaveable{ mutableStateOf("") }
     var isError by rememberSaveable {mutableStateOf(false) }
@@ -71,6 +76,7 @@ fun CurrencyInputBox(
                 isError = false
                 if (it.contains('\n')) {
                     onInputConfirmed()
+                    onClickEnter()
                 }else {
                     bufferValue = it
                 }
@@ -79,11 +85,17 @@ fun CurrencyInputBox(
             modifier = Modifier
                 .onFocusChanged {
                     if (!it.isFocused) {
+                        // on losing the focus: likely the input is confirmed
                         onInputConfirmed()
+                    } else {
+                        // on capturing the focus: reset input box if the value is 0
+                        if (bufferValue == "0.00") {
+                            bufferValue = ""
+                        }
                     }
                 }
                 .fillMaxWidth()
-                .focusable(isEditable),
+                .focusRequester(focusRequester),
             isError = isError,
             readOnly = !isEditable,
             textStyle = Typography.h6
