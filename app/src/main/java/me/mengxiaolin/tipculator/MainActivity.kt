@@ -4,8 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -15,11 +18,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var subTotal by remember { mutableStateOf(0) }
-            var tax by remember { mutableStateOf(0) }
-            var tipsRate by remember { mutableStateOf(15) }
-            var isRoundToDollar by remember { mutableStateOf(false) }
-
+            var subTotal by rememberSaveable { mutableStateOf(0) }
+            var tax by rememberSaveable { mutableStateOf(0) }
+            var tipsRate by rememberSaveable { mutableStateOf(15) }
+            var isRoundToDollar by rememberSaveable { mutableStateOf(false) }
+            val scrollState = rememberScrollState(0)
             val tipsInCent = calculateTips(subTotal, tax, tipsRate, isRoundToDollar)
 
             TipculatorTheme {
@@ -28,7 +31,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)){
+                    Column(modifier = Modifier
+                        .padding(12.dp)
+                        .verticalScroll(scrollState)
+                    ){
                         CurrencyInputBox(
                             label = stringResource(R.string.subtotal_label),
                             valueInCents = subTotal,

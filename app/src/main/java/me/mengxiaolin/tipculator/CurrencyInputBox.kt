@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -40,8 +41,8 @@ fun CurrencyInputBox(
     onValueChange: (Int) -> Unit,
     isEditable: Boolean = true
 ) {
-    var bufferValue by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false) }
+    var bufferValue by rememberSaveable{ mutableStateOf("") }
+    var isError by rememberSaveable {mutableStateOf(false) }
     LaunchedEffect(key1 = valueInCents, block = {
         bufferValue = (valueInCents.toBigDecimal().setScale(2) / BigDecimal.valueOf(100.0)).toString()
     })
