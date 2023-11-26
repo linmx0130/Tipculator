@@ -8,4 +8,9 @@
     <string name="is_round_to_dollar_label">取整</string>
     <string name="tips_label">小费</string>
     <string name="total_label">总额</string>
+
+    <string name="menu_description">菜单</string>
+    <string name="about_label">关于</string>
+    <string name="version_name_label">版本</string>
+    <string name="dialog_confirmation_button_label">确认</string>
 </resources>

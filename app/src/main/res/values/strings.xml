@@ -7,4 +7,11 @@
     <string name="is_round_to_dollar_label">Round to dollar</string>
     <string name="tips_label">Tips</string>
     <string name="total_label">Total</string>
+
+    <string name="menu_description">Menu</string>
+    <string name="about_label">About</string>
+    <string name="version_name_label">Version</string>
+    <string name="dialog_confirmation_button_label">OK</string>
+    <string name="copyright_declaration" translatable="false">Copyright (c) 2023, Mengxiao Lin. All rights reserved.</string>
+    <string name="github_url" translatable="false">https://github.com/linmx0130/Tipculator</string>
 </resources>
