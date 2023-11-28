@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
             val tipsInCent = calculateTips(subTotal, tax, tipsRate, isRoundToDollar)
 
             val taxInputBoxFocusRequester = remember { FocusRequester() }
+            val totalInputBoxFocusRequester = remember { FocusRequester() }
             var isAboutDialogOpen by remember { mutableStateOf(false) }
 
             TipculatorTheme {
@@ -94,6 +95,7 @@ class MainActivity : ComponentActivity() {
                                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                                     imm.hideSoftInputFromWindow(view.windowToken, 0)
                                 }
+                                totalInputBoxFocusRequester.requestFocus()
                             }
                         )
                         TipsRateSelector(
@@ -113,6 +115,7 @@ class MainActivity : ComponentActivity() {
                         CurrencyInputBox(
                             label = stringResource(R.string.total_label),
                             valueInCents = subTotal + tax + tipsInCent,
+                            focusRequester = totalInputBoxFocusRequester,
                             onValueChange = {},
                             isEditable = false
                         )
