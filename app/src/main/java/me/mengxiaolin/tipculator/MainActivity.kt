@@ -3,7 +3,6 @@ package me.mengxiaolin.tipculator
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
@@ -20,18 +19,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import me.mengxiaolin.tipculator.repository.PreferencesRepository
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
 import me.mengxiaolin.tipculator.ui.theme.Typography
 
 class MainActivity : ComponentActivity() {
+
+    private val preferences: PreferencesRepository by lazy {
+        PreferencesRepository(this.application)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             var subTotal by rememberSaveable { mutableStateOf(0) }
             var tax by rememberSaveable { mutableStateOf(0) }
-            var tipsRate by rememberSaveable { mutableStateOf(15) }
-            var isRoundToDollar by rememberSaveable { mutableStateOf(false) }
+            val tipsRate by preferences.tipsRate.collectAsState(initial = 15)
+            val isRoundToDollar by preferences.isRoundToZero.collectAsState(initial = false)
             val scrollState = rememberScrollState(0)
             val tipsInCent = calculateTips(subTotal, tax, tipsRate, isRoundToDollar)
 
@@ -101,10 +106,16 @@ class MainActivity : ComponentActivity() {
                         TipsRateSelector(
                             value = tipsRate,
                             onValueChanged = {
-                                tipsRate = it
+                                lifecycleScope.launch {
+                                    preferences.setTipsRate(it)
+                                }
                             },
                             isRoundToDollar = isRoundToDollar,
-                            onIsRoundToDollarChanged = {isRoundToDollar = it}
+                            onIsRoundToDollarChanged = {
+                                lifecycleScope.launch {
+                                    preferences.setIsRoundToZero(it)
+                                }
+                            }
                         )
                         CurrencyInputBox(
                             label = stringResource(R.string.tips_label),
