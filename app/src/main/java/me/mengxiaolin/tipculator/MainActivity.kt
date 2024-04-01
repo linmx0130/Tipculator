@@ -1,13 +1,10 @@
 package me.mengxiaolin.tipculator
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import me.mengxiaolin.tipculator.repository.PreferencesRepository
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
-import me.mengxiaolin.tipculator.ui.theme.Typography
 
 class MainActivity : ComponentActivity() {
 
@@ -132,34 +128,10 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     if (isAboutDialogOpen) {
-                        val githubUrl = stringResource(id = R.string.github_url)
-                        AlertDialog(
-                            onDismissRequest = {isAboutDialogOpen = false},
-                            confirmButton = {
-                                Button(onClick = {isAboutDialogOpen = false}) {
-                                    Text(stringResource(id = R.string.dialog_confirmation_button_label))
-                                }
-                            },
-                            title = {Text(stringResource(id = R.string.about_label))},
-                            text = {
-                                Column {
-                                    Text(stringResource(id = R.string.app_name), style = Typography.h6)
-                                    Text("${stringResource(R.string.version_name_label)} ${BuildConfig.VERSION_NAME}")
-                                    Text(stringResource(id = R.string.copyright_declaration))
-                                    Text(githubUrl, modifier = Modifier.clickable {
-                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
-                                        startActivity(intent)
-                                    })
-                                }
-                            }
-                        )
+                        AboutDialog {isAboutDialogOpen = false}
                     }
                 }
             }
         }
     }
-}
-@Composable
-private fun AppTopBar() {
-
 }
