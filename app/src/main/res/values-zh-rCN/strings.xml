@@ -8,6 +8,9 @@
     <string name="is_round_to_dollar_label">取整</string>
     <string name="tips_label">小费</string>
     <string name="total_label">总额</string>
+    <string name="split_label">拆帐人数</string>
+    <string name="subtotal_after_split_label">人均金额</string>
+    <string name="tax_after_split_label">人均税费</string>
 
     <string name="menu_description">菜单</string>
     <string name="about_label">关于</string>

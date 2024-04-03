@@ -7,6 +7,9 @@
     <string name="is_round_to_dollar_label">Round to dollar</string>
     <string name="tips_label">Tips</string>
     <string name="total_label">Total</string>
+    <string name="split_label">Split person count</string>
+    <string name="subtotal_after_split_label">Subtotal after split</string>
+    <string name="tax_after_split_label">Tax after split</string>
 
     <string name="menu_description">Menu</string>
     <string name="about_label">About</string>

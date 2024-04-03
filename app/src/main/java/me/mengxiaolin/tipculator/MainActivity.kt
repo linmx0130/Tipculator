@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import me.mengxiaolin.tipculator.repository.PreferencesRepository
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
 
@@ -29,13 +30,42 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // sub total price before tax
             var subTotal by rememberSaveable { mutableStateOf(0) }
+            // all tax, which is not subject to tips
             var tax by rememberSaveable { mutableStateOf(0) }
+            // How many persons are splitting the bill. A null value will hide the input.
+            var splitPersonCount by rememberSaveable {
+                mutableStateOf<Int?>(1)
+            }
+            // tips rate you want to grant
             val tipsRate by preferences.tipsRate.collectAsState(initial = 15)
+            // whether to round the total number to an integer
             val isRoundToDollar by preferences.isRoundToZero.collectAsState(initial = false)
-            val scrollState = rememberScrollState(0)
-            val tipsInCent = calculateTips(subTotal, tax, tipsRate, isRoundToDollar)
 
+            // Sub total after split
+            val splitSubTotal = if (splitPersonCount != null) {
+                (subTotal.toDouble() / (splitPersonCount?:1)).roundToInt()
+            } else {
+                subTotal
+            }
+            // tax after split
+            val splitTax = if (splitPersonCount != null) {
+                (tax.toDouble() / (splitPersonCount?:1)).roundToInt()
+            } else {
+                tax
+            }
+
+            // tips in cent
+            val tipsInCent = calculateTips(
+                subTotal = splitSubTotal,
+                tax = splitTax,
+                tipsRate = tipsRate,
+                isRoundToDollar = isRoundToDollar
+            )
+
+            // UI control states
+            val scrollState = rememberScrollState(0)
             val taxInputBoxFocusRequester = remember { FocusRequester() }
             val totalInputBoxFocusRequester = remember { FocusRequester() }
             var isAboutDialogOpen by remember { mutableStateOf(false) }
@@ -113,6 +143,27 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         )
+                        if (splitPersonCount != null) {
+                            PositiveIntegerInputBox(
+                                label = stringResource(id = R.string.split_label),
+                                value = splitPersonCount!!,
+                                onValueChange = {
+                                    splitPersonCount = it
+                                }
+                            )
+                            CurrencyInputBox(
+                                label = stringResource(R.string.subtotal_after_split_label),
+                                valueInCents = splitSubTotal,
+                                onValueChange = {},
+                                isEditable = false
+                            )
+                            CurrencyInputBox(
+                                label = stringResource(R.string.tax_after_split_label),
+                                valueInCents = splitTax,
+                                onValueChange = {},
+                                isEditable = false
+                            )
+                        }
                         CurrencyInputBox(
                             label = stringResource(R.string.tips_label),
                             valueInCents = tipsInCent,
@@ -121,7 +172,7 @@ class MainActivity : ComponentActivity() {
                         )
                         CurrencyInputBox(
                             label = stringResource(R.string.total_label),
-                            valueInCents = subTotal + tax + tipsInCent,
+                            valueInCents = ((subTotal + tax).toDouble() / (splitPersonCount?:1)).roundToInt() + tipsInCent,
                             focusRequester = totalInputBoxFocusRequester,
                             onValueChange = {},
                             isEditable = false
