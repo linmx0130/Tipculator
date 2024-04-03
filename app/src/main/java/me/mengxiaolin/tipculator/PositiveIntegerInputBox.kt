@@ -39,12 +39,13 @@ fun PositiveIntegerInputBox(label: String,
 
     LaunchedEffect(key1 = value, block = {
         bufferValue = value.toString()
+        isError = false
     })
 
     val onInputConfirmed = {
         val pureNumberStr = bufferValue.filter { c -> c.isDigit()}
         if (pureNumberStr.isEmpty()) {
-            onValueChange(1)
+            isError = true
         } else {
             val number = pureNumberStr.toInt()
             if (number > 0) {

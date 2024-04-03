@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
             var tax by rememberSaveable { mutableStateOf(0) }
             // How many persons are splitting the bill. A null value will hide the input.
             var splitPersonCount by rememberSaveable {
-                mutableStateOf<Int?>(1)
+                mutableStateOf<Int?>(null)
             }
             // tips rate you want to grant
             val tipsRate by preferences.tipsRate.collectAsState(initial = 15)
@@ -90,6 +90,20 @@ class MainActivity : ComponentActivity() {
                                     expanded = isMenuExpanded,
                                     onDismissRequest = { isMenuExpanded = false },
                                 ) {
+                                    DropdownMenuItem(onClick = {
+                                        splitPersonCount = if (splitPersonCount == null) {
+                                            2
+                                        } else {
+                                            null
+                                        }
+                                        isMenuExpanded = false
+                                    }) {
+                                        if (splitPersonCount == null) {
+                                            Text(stringResource(id = R.string.enable_split_label))
+                                        } else {
+                                            Text(stringResource(id = R.string.disable_split_label))
+                                        }
+                                    }
                                     DropdownMenuItem(onClick = {
                                         isAboutDialogOpen = true
                                         isMenuExpanded = false
@@ -172,7 +186,7 @@ class MainActivity : ComponentActivity() {
                         )
                         CurrencyInputBox(
                             label = stringResource(R.string.total_label),
-                            valueInCents = ((subTotal + tax).toDouble() / (splitPersonCount?:1)).roundToInt() + tipsInCent,
+                            valueInCents = splitSubTotal +splitTax + tipsInCent,
                             focusRequester = totalInputBoxFocusRequester,
                             onValueChange = {},
                             isEditable = false
