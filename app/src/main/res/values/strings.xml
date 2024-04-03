@@ -17,6 +17,6 @@
     <string name="about_label">About</string>
     <string name="version_name_label">Version</string>
     <string name="dialog_confirmation_button_label">OK</string>
-    <string name="copyright_declaration" translatable="false">Copyright (c) 2023-2024, Mengxiao Lin. All rights reserved.</string>
+    <string name="copyright_declaration" translatable="false">Copyright (c) 2023-2024, NutStudio. All rights reserved.</string>
     <string name="github_url" translatable="false">https://github.com/linmx0130/Tipculator</string>
 </resources>
