@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'me.mengxiaolin.tipculator'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "me.mengxiaolin.tipculator"
         minSdk 28
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "0.1"
 
