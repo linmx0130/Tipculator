@@ -12,6 +12,7 @@
     <string name="tax_after_split_label">Tax after split</string>
 
     <string name="menu_description">Menu</string>
+    <string name="receipt_capture_label">Capture a receipt</string>
     <string name="enable_split_label">Enable split</string>
     <string name="disable_split_label">Disable split</string>
     <string name="about_label">About</string>

@@ -1,10 +1,14 @@
 package me.mengxiaolin.tipculator
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,19 +20,26 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import me.mengxiaolin.tipculator.repository.PreferencesRepository
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
+import java.io.File
+import java.io.FileInputStream
 import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
-
+    private lateinit var receiptImageDirectory: File
     private val preferences: PreferencesRepository by lazy {
         PreferencesRepository(this.application)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val captureReceiptAction = registerCaptureReceiptActionCallback()
+
         setContent {
             // sub total price before tax
             var subTotal by rememberSaveable { mutableStateOf(0) }
@@ -90,6 +101,13 @@ class MainActivity : ComponentActivity() {
                                     expanded = isMenuExpanded,
                                     onDismissRequest = { isMenuExpanded = false },
                                 ) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            captureReceiptAction.launch(receiptImageFileUri)
+                                        }
+                                    ) {
+                                        Text(stringResource(id = R.string.receipt_capture_label))
+                                    }
                                     DropdownMenuItem(onClick = {
                                         splitPersonCount = if (splitPersonCount == null) {
                                             2
@@ -199,4 +217,32 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun registerCaptureReceiptActionCallback(): ActivityResultLauncher<Uri> {
+        receiptImageDirectory = File(filesDir, "receipt_images")
+        if (!receiptImageDirectory.exists()) {
+            receiptImageDirectory.mkdirs()
+        }
+        val file = File(receiptImageDirectory,"receipt.png")
+
+        // capture receipt action declaration
+        return  registerForActivityResult(ActivityResultContracts.TakePicture()) {
+            if (it == true) {
+                val fis = FileInputStream(file)
+                val bytes = fis.readBytes()
+                Log.d("MainActivity", "image obtained: " + bytes.size)
+                // perform text recognition
+            }
+        }
+    }
+
+    private val receiptImageFileUri : Uri
+        get() {
+            val file = File(receiptImageDirectory,"receipt.png")
+            return FileProvider.getUriForFile(
+                this@MainActivity,
+                applicationContext.packageName + ".file_provider",
+                file
+            )
+        }
 }
