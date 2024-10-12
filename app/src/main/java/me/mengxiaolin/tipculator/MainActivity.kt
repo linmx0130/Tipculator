@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -120,6 +121,7 @@ class MainActivity : ComponentActivity() {
                                     DropdownMenuItem(
                                         onClick = {
                                             captureReceiptAction.launch(receiptImageFileUri)
+                                            isMenuExpanded = false
                                         }
                                     ) {
                                         Text(stringResource(id = R.string.receipt_capture_label))
@@ -244,12 +246,19 @@ class MainActivity : ComponentActivity() {
         // capture receipt action declaration
         return  registerForActivityResult(ActivityResultContracts.TakePicture()) {
             if (it == true) {
-                val fis = FileInputStream(file)
-                val bytes = fis.readBytes()
-                Log.d("MainActivity", "image obtained: " + bytes.size)
-                // perform text recognition
-                // TODO: use the real number parsed from text recognition.
-                viewModel.subTotal = bytes.size
+                receiptImageTextRecognition(this@MainActivity, file) { result, exception ->
+                    if (exception != null) {
+                        Toast.makeText(this@MainActivity, "Error during text recognition.", Toast.LENGTH_LONG).show()
+                        return@receiptImageTextRecognition
+                    }
+                    if (result == null){
+                        Toast.makeText(this@MainActivity, "Subtotal and tax information not found.", Toast.LENGTH_LONG).show()
+                        return@receiptImageTextRecognition
+                    }
+                    viewModel.subTotal = result.subTotal
+                    viewModel.tax = result.tax
+                }
+
             }
         }
     }
