@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,7 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import kotlinx.coroutines.launch
 import me.mengxiaolin.tipculator.repository.PreferencesRepository
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
@@ -29,11 +34,22 @@ import java.io.File
 import java.io.FileInputStream
 import kotlin.math.roundToInt
 
+@OptIn(SavedStateHandleSaveableApi::class)
+class MainActivityViewModel(private val savedStateHandle: SavedStateHandle): ViewModel() {
+    var subTotal: Int by savedStateHandle.saveable {
+        mutableIntStateOf(0)
+    }
+    var tax: Int by savedStateHandle.saveable {
+        mutableIntStateOf(0)
+    }
+}
+
 class MainActivity : ComponentActivity() {
     private lateinit var receiptImageDirectory: File
     private val preferences: PreferencesRepository by lazy {
         PreferencesRepository(this.application)
     }
+    private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +58,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             // sub total price before tax
-            var subTotal by rememberSaveable { mutableStateOf(0) }
+            var subTotal = viewModel.subTotal
             // all tax, which is not subject to tips
-            var tax by rememberSaveable { mutableStateOf(0) }
+            var tax = viewModel.tax
             // How many persons are splitting the bill. A null value will hide the input.
             var splitPersonCount by rememberSaveable {
                 mutableStateOf<Int?>(null)
@@ -232,6 +248,8 @@ class MainActivity : ComponentActivity() {
                 val bytes = fis.readBytes()
                 Log.d("MainActivity", "image obtained: " + bytes.size)
                 // perform text recognition
+                // TODO: use the real number parsed from text recognition.
+                viewModel.subTotal = bytes.size
             }
         }
     }
