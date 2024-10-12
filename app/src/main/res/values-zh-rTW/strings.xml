@@ -13,6 +13,7 @@
     <string name="tax_after_split_label">人均稅費</string>
 
     <string name="menu_description">菜單</string>
+    <string name="receipt_capture_label">拍攝收據</string>
     <string name="enable_split_label">拆帳</string>
     <string name="disable_split_label">取消拆帳</string>
     <string name="about_label">關於</string>
