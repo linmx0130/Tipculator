@@ -9,6 +9,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 import java.io.IOException
 import java.lang.Exception
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
@@ -60,20 +61,20 @@ fun receiptImageTextRecognition(context: Context, file: File, callback: (Receipt
             } else null
 
             if (subTotalValue != null && taxValue != null) {
-                val subtotal = (subTotalValue.trim().trim('$').toFloat()* 100).toInt()
-                val tax = (taxValue.trim().trim('$').toFloat() * 100).toInt()
+                val subtotal = ceil(subTotalValue.trim().trim('$').toDouble()* 100).toInt()
+                val tax = ceil(taxValue.trim().trim('$').toDouble() * 100).toInt()
                 callback(ReceiptImageRecognitionResult(subtotal, tax), null)
                 return@addOnSuccessListener
             }
 
             if (subTotalValue != null ) {
-                val subtotal = (subTotalValue.trim().trim('$').toFloat()* 100).toInt()
+                val subtotal = ceil(subTotalValue.trim().trim('$').toDouble()* 100).toInt()
                 callback(ReceiptImageRecognitionResult(subtotal, 0), null)
                 return@addOnSuccessListener
             }
 
             if (totalValue != null ) {
-                val total = (totalValue.trim().trim('$').toFloat()* 100).toInt()
+                val total = ceil(totalValue.trim().trim('$').toDouble()* 100).toInt()
                 callback(ReceiptImageRecognitionResult(total, 0), null)
                 return@addOnSuccessListener
             }
