@@ -3,7 +3,6 @@ package me.mengxiaolin.tipculator
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -32,16 +31,23 @@ import kotlinx.coroutines.launch
 import me.mengxiaolin.tipculator.repository.PreferencesRepository
 import me.mengxiaolin.tipculator.ui.theme.TipculatorTheme
 import java.io.File
-import java.io.FileInputStream
 import kotlin.math.roundToInt
 
 @OptIn(SavedStateHandleSaveableApi::class)
 class MainActivityViewModel(private val savedStateHandle: SavedStateHandle): ViewModel() {
+    // sub total price before tax
     var subTotal: Int by savedStateHandle.saveable {
         mutableIntStateOf(0)
     }
+
+    // all tax, which is not subject to tips
     var tax: Int by savedStateHandle.saveable {
         mutableIntStateOf(0)
+    }
+
+    // How many persons are splitting the bill. A null value will hide the input.
+    var splitPersonCount: Int? by savedStateHandle.saveable{
+        mutableStateOf<Int?>(null)
     }
 }
 
@@ -58,30 +64,22 @@ class MainActivity : ComponentActivity() {
         val captureReceiptAction = registerCaptureReceiptActionCallback()
 
         setContent {
-            // sub total price before tax
-            var subTotal = viewModel.subTotal
-            // all tax, which is not subject to tips
-            var tax = viewModel.tax
-            // How many persons are splitting the bill. A null value will hide the input.
-            var splitPersonCount by rememberSaveable {
-                mutableStateOf<Int?>(null)
-            }
             // tips rate you want to grant
             val tipsRate by preferences.tipsRate.collectAsState(initial = 15)
             // whether to round the total number to an integer
             val isRoundToDollar by preferences.isRoundToZero.collectAsState(initial = false)
 
             // Sub total after split
-            val splitSubTotal = if (splitPersonCount != null) {
-                (subTotal.toDouble() / (splitPersonCount?:1)).roundToInt()
+            val splitSubTotal = if (viewModel.splitPersonCount != null) {
+                (viewModel.subTotal.toDouble() / (viewModel.splitPersonCount?:1)).roundToInt()
             } else {
-                subTotal
+                viewModel.subTotal
             }
             // tax after split
-            val splitTax = if (splitPersonCount != null) {
-                (tax.toDouble() / (splitPersonCount?:1)).roundToInt()
+            val splitTax = if (viewModel.splitPersonCount != null) {
+                (viewModel.tax.toDouble() / (viewModel.splitPersonCount?:1)).roundToInt()
             } else {
-                tax
+                viewModel.tax
             }
 
             // tips in cent
@@ -127,14 +125,14 @@ class MainActivity : ComponentActivity() {
                                         Text(stringResource(id = R.string.receipt_capture_label))
                                     }
                                     DropdownMenuItem(onClick = {
-                                        splitPersonCount = if (splitPersonCount == null) {
+                                        viewModel.splitPersonCount = if (viewModel.splitPersonCount == null) {
                                             2
                                         } else {
                                             null
                                         }
                                         isMenuExpanded = false
                                     }) {
-                                        if (splitPersonCount == null) {
+                                        if (viewModel.splitPersonCount == null) {
                                             Text(stringResource(id = R.string.enable_split_label))
                                         } else {
                                             Text(stringResource(id = R.string.disable_split_label))
@@ -158,16 +156,16 @@ class MainActivity : ComponentActivity() {
                     ){
                         CurrencyInputBox(
                             label = stringResource(R.string.subtotal_label),
-                            valueInCents = subTotal,
-                            onValueChange = { subTotal = it },
+                            valueInCents = viewModel.subTotal,
+                            onValueChange = { viewModel.subTotal = it },
                             onClickEnter = {
                                 taxInputBoxFocusRequester.requestFocus()
                             }
                         )
                         CurrencyInputBox(
                             label = stringResource(R.string.tax_label),
-                            valueInCents = tax,
-                            onValueChange = { tax = it },
+                            valueInCents = viewModel.tax,
+                            onValueChange = { viewModel.tax = it },
                             focusRequester = taxInputBoxFocusRequester,
                             onClickEnter = {
                                 // hide the soft keyboard when user finishes input
@@ -193,12 +191,12 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         )
-                        if (splitPersonCount != null) {
+                        if (viewModel.splitPersonCount != null) {
                             PositiveIntegerInputBox(
                                 label = stringResource(id = R.string.split_label),
-                                value = splitPersonCount!!,
+                                value = viewModel.splitPersonCount!!,
                                 onValueChange = {
-                                    splitPersonCount = it
+                                    viewModel.splitPersonCount = it
                                 }
                             )
                             CurrencyInputBox(
@@ -245,7 +243,7 @@ class MainActivity : ComponentActivity() {
 
         // capture receipt action declaration
         return  registerForActivityResult(ActivityResultContracts.TakePicture()) {
-            if (it == true) {
+            if (it) {
                 receiptImageTextRecognition(this@MainActivity, file) { result, exception ->
                     if (exception != null) {
                         Toast.makeText(this@MainActivity, "Error during text recognition.", Toast.LENGTH_LONG).show()
