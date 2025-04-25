@@ -7,13 +7,15 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import me.mengxiaolin.tipculator.ui.theme.Typography
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
@@ -58,9 +60,10 @@ class MainActivity : ComponentActivity() {
     }
     private val viewModel: MainActivityViewModel by viewModels()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         val captureReceiptAction = registerCaptureReceiptActionCallback()
 
         setContent {
@@ -120,10 +123,11 @@ class MainActivity : ComponentActivity() {
                                         onClick = {
                                             captureReceiptAction.launch(receiptImageFileUri)
                                             isMenuExpanded = false
+                                        },
+                                        text = {
+                                            Text(stringResource(id = R.string.receipt_capture_label), style=Typography.bodyMedium)
                                         }
-                                    ) {
-                                        Text(stringResource(id = R.string.receipt_capture_label))
-                                    }
+                                    )
                                     DropdownMenuItem(onClick = {
                                         viewModel.splitPersonCount = if (viewModel.splitPersonCount == null) {
                                             2
@@ -131,24 +135,24 @@ class MainActivity : ComponentActivity() {
                                             null
                                         }
                                         isMenuExpanded = false
-                                    }) {
+                                    }, text = {
                                         if (viewModel.splitPersonCount == null) {
-                                            Text(stringResource(id = R.string.enable_split_label))
+                                            Text(stringResource(id = R.string.enable_split_label), style=Typography.bodyMedium)
                                         } else {
-                                            Text(stringResource(id = R.string.disable_split_label))
+                                            Text(stringResource(id = R.string.disable_split_label), style=Typography.bodyMedium)
                                         }
-                                    }
+                                    })
                                     DropdownMenuItem(onClick = {
                                         isAboutDialogOpen = true
                                         isMenuExpanded = false
-                                    }) {
-                                        Text(stringResource(id = R.string.about_label))
-                                    }
+                                    }, text = {
+                                        Text(stringResource(id = R.string.about_label), style=Typography.bodyMedium)
+                                    })
                                 }
                             }
                         )
                     },
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     Column(modifier = Modifier
                         .padding(innerPadding)

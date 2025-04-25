@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 
@@ -74,7 +74,7 @@ fun CurrencyInputBox(
     }
 
     Column (modifier = Modifier.padding(12.dp)) {
-        Text(label, style= Typography.h5, modifier = Modifier.padding(end = 4.dp))
+        Text(label, style= Typography.headlineSmall, modifier = Modifier.padding(end = 4.dp))
         TextField(
             value = bufferValue,
             onValueChange = {
@@ -118,7 +118,7 @@ fun CurrencyInputBox(
                 .focusRequester(focusRequester),
             isError = isError,
             readOnly = !isEditable,
-            textStyle = Typography.h6,
+            textStyle = Typography.headlineSmall,
         )
     }
 }

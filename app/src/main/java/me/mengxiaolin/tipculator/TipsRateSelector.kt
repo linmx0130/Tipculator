@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +26,7 @@ fun TipsRateSelector(
         Modifier
             .padding(12.dp)
             .fillMaxWidth()) {
-        Text(text = stringResource(id = R.string.tips_rate_label), style = Typography.h5)
+        Text(text = stringResource(id = R.string.tips_rate_label), style = Typography.headlineSmall)
         Row(modifier= Modifier.fillMaxWidth()) {
             Slider(
                 value = value.toFloat(),
@@ -37,7 +37,7 @@ fun TipsRateSelector(
             )
             Text(
                 text = "$value%",
-                style = Typography.h6,
+                style = Typography.headlineSmall,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .fillMaxWidth(),
@@ -48,7 +48,7 @@ fun TipsRateSelector(
             Checkbox(checked = isRoundToDollar, onCheckedChange = onIsRoundToDollarChanged)
             Text(
                 stringResource(id = R.string.is_round_to_dollar_label),
-                style = Typography.h6,
+                style = Typography.bodyMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
